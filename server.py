@@ -31,7 +31,6 @@ def showSummary():
         return render_template('welcome.html',club=club,competitions=competitions)
     except IndexError:
         return render_template('email_error.html')
-    #"Sorry, this email is not registered"
 
 
 @app.route('/book/<competition>/<club>')
