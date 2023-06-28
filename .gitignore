@@ -5,4 +5,5 @@ lib
 tests/
 .envrc
 __pycache__
+.vscode
 Scripts/
