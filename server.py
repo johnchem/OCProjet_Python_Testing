@@ -31,8 +31,11 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html', club=club, competitions=competitions)
+    try:
+        club = [club for club in clubs if club['email'] == request.form['email']][0]
+        return render_template('welcome.html',club=club,competitions=competitions)
+    except IndexError:
+        return render_template('email_error.html')
 
 
 @app.route('/book/<competition>/<club>')
@@ -52,6 +55,10 @@ def purchasePlaces():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
 
+    if int(club['points']) < placesRequired:
+        flash("You doesn't have enough points")
+        return render_template('welcome.html', club=club, competitions=competitions)
+    
     if club['name'] in competition:
         placesBooked = competition[club['name']]
     else:
@@ -62,7 +69,7 @@ def purchasePlaces():
         flash("You cannot book more than 12 places per competition")
         flash(f"you already have {placesBooked} places")
         return render_template('welcome.html', club=club, competitions=competitions)
-
+     
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     competition[club['name']] = totalPlaces
     flash('Great-booking complete!')
