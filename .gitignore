@@ -6,3 +6,5 @@ tests/
 .envrc
 __pycache__
 .vscode
+Scripts
+pyvenv.cfg
