@@ -1,17 +1,26 @@
 import json
+from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for
+
+
+def isCompetitionActive(competition_date):
+    competition_date = datetime.strptime(competition_date, "%Y-%m-%d %X")
+    today = datetime.today()
+    return True if competition_date > today else False
 
 
 def loadClubs():
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+        listOfClubs = json.load(c)['clubs']
+        return listOfClubs
 
 
 def loadCompetitions():
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+        listOfCompetitions = json.load(comps)['competitions']
+        for competition in listOfCompetitions:
+            competition['isActive'] = isCompetitionActive(competition['date'])
+        return listOfCompetitions
 
 
 app = Flask(__name__)
