@@ -1,0 +1,52 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary | GUDLFT Registration</title>
+    <style>
+        .table__cell {
+            text-align: center;
+            padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+        }
+        .table__rows:nth-child(even) {
+            background-color: lightgrey;
+        }
+
+        .table__header .table__cell {
+            text-align: center;
+            font-weight: bold;
+            border-bottom: black 1pt solid;
+        }
+        
+    </style>
+</head>
+<body>
+        <h2>Welcome</h2>
+
+    {% with messages = get_flashed_messages()%}
+    {% if messages %}
+        <ul>
+       {% for message in messages %}
+            <li>{{message}}</li>
+        {% endfor %}
+       </ul>
+    {% endif%}
+    <h3>Clubs registered</h3>
+    <table class="table">
+        <tr class="table__header">
+            {% for header in headings %}
+                <td class="table__cell">{{header}}</td>
+            {% endfor%}
+        </tr>
+        {% for club in listOfClubs%}
+            <tr class="table__rows">
+                <td class="table__cell">{{club['name']}}</td>
+                <td class="table__cell">{{club['points']}}</td>
+            </tr>
+        {%endfor%}
+    </table>
+    {%endwith%}
+    <br>
+    <a href="{{ url_for('index')}}">Back login</a>
+</body>
+</html>
