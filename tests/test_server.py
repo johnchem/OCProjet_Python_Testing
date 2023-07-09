@@ -48,7 +48,9 @@ def _list_of_clubs():
 def _list_of_competitions():
     return MOCK_COMPETITIONS["competitions"]
 
+###########################
 ### DB reading function ###	
+###########################
 
 def test_load_clubs(tmp_path, monkeypatch):
     # creation of the mock file
@@ -101,7 +103,9 @@ def test_load_competitions(tmp_path, monkeypatch):
     assert results[2]['date'] == control_data[2]["date"]
     assert results[2]['numberOfPlaces'] == control_data[2]["numberOfPlaces"]
 
+##########################
 ### Logic verification ###
+##########################
 
 def test_isCompetitionActive():
     list_competitions = MOCK_COMPETITIONS["competitions"]
@@ -205,8 +209,10 @@ def test_limit_booking_places_through_multiple_order(client, monkeypatch):
 
     assert result.status_code == 400
     assert data.find("<li>You cannot book more than 12 places per competition</li>") != -1
-    
+
+##################################
 ### Page status code compliant ###
+##################################
 
 def test_index_status_code_ok(client):
     response = client.get('/')
@@ -232,6 +238,21 @@ def test_showSummary_status_code_ok(client, monkeypatch):
     
     assert response.status_code == 200
 
+def test_showSummary_status_code_401(client, monkeypatch):
+    clubs = MOCK_CLUBS["clubs"]
+    competitions = MOCK_COMPETITIONS["competitions"]
+
+    monkeypatch.setattr(server, 'clubs', clubs)
+    monkeypatch.setattr(server, 'competitions', competitions)
+    
+    response = client.post('/showSummary',
+        data = {
+            "email": "unknown@email.com" 
+        })
+    
+    assert response.status_code == 401
+    assert response.data.find("Sorry, this email is not registered") != -1
+
 def test_book_statut_code_ok(client, monkeypatch):
     clubs = MOCK_CLUBS["clubs"]
     competitions = MOCK_COMPETITIONS["competitions"]
@@ -245,6 +266,17 @@ def test_book_statut_code_ok(client, monkeypatch):
     response = client.get(f'/book/{competition["name"]}/{club["name"]}')
     
     assert response.status_code == 200
+
+def test_book_statut_code_302(client, monkeypatch):
+    clubs = MOCK_CLUBS["clubs"]
+    competitions = MOCK_COMPETITIONS["competitions"]
+
+    monkeypatch.setattr(server, 'clubs', clubs)
+    monkeypatch.setattr(server, 'competitions', competitions)
+
+    response = client.get(f'/book/test/crash')
+    
+    assert response.status_code == 302
 
 def test_purchasePlaces_statut_code_ok(client, monkeypatch):
     clubs = MOCK_CLUBS["clubs"]
@@ -275,7 +307,9 @@ def test_logout_statut_code_ok(client):
     result = client.get('/logout')
     assert result.status_code == 200
 
-### UI verification
+#######################
+### UI verification ###
+#######################
 
 def test_display_actual_point(client, monkeypatch):
     clubs = _list_of_clubs()
