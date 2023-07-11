@@ -249,10 +249,11 @@ def test_showSummary_status_code_401(client, monkeypatch):
         data = {
             "email": "unknown@email.com" 
         })
+    data = response.data.decode()
     
     assert response.status_code == 401
-    assert response.data.find("Sorry, this email is not registered") != -1
-
+    assert data.find("Sorry, this email is not registered") != -1
+    
 def test_book_statut_code_ok(client, monkeypatch):
     clubs = MOCK_CLUBS["clubs"]
     competitions = MOCK_COMPETITIONS["competitions"]
