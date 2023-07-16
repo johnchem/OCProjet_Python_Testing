@@ -1,8 +1,10 @@
 import pytest
 import json
+import re
+from bs4 import BeautifulSoup
+
 import server
 from server import *
-import re
 
 MOCK_COMPETITIONS = {
     "competitions": [
@@ -117,22 +119,46 @@ def test_isCompetitionActive():
 def test_book_to_full_competition_not_accessible(client, monkeypatch):
     clubs = _list_of_clubs()
     competitions = _list_of_competitions()
+
+    club = MOCK_CLUBS["clubs"][0]
+
+    competitions[0]["numberOfPlaces"] = 10
+    competitions[0]["date"] = "2025-08-05 01:01:00"
+    competitions[0]["isActive"] = True
+    
+    competitions[1]["numberOfPlaces"] = 10
+    competitions[1]["date"] = "2025-10-11 01:01:00"
+    competitions[1]["isActive"] = True
+
+    competitions[2]["numberOfPlaces"] = 0
+    competitions[2]["date"] = "2025-01-01 01:01:00"
+    competitions[2]["isActive"] = True
+        
     monkeypatch.setattr(server, 'clubs', clubs)
     monkeypatch.setattr(server, 'competitions', competitions)
-
     
-    club = MOCK_CLUBS["clubs"][0]
-    club["points"] = 5
-    competition = MOCK_COMPETITIONS["competitions"][0]
-        
-    result = client.post('/purchasePlaces', data={
-        "competition": competition["name"],
-        "club": club["name"],
-        "places":1,
-    })
-    data = result.data.decode()
-    assert data.find("<li>Great-booking complete!</li>") != -1
+    result = client.post(
+        '/showSummary',
+        data = {
+            "email": club["email"]
+        }
+    )
 
+    soup = BeautifulSoup(result.data, "html.parser")
+    competitions_elements = soup.ul
+    
+    negative_result = competitions_elements.find(
+        string=re.compile(competitions[2]["name"])
+        ).find("a")
+    
+    positive_result = competitions_elements.find_all(
+        "a",
+        href=re.compile("book"),
+        )
+
+    assert negative_result == -1
+    assert len(positive_result) > 0
+    
 def test_club_without_points_cant_book(client, monkeypatch):
     clubs = _list_of_clubs()
     competitions = _list_of_competitions()
