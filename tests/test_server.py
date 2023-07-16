@@ -81,10 +81,10 @@ def test_load_clubs(tmp_path, monkeypatch):
     
 def test_load_competitions(tmp_path, monkeypatch):
     # creation of the mock file
-    test_clubs_file = tmp_path/"competitions.json"
-    test_clubs_file.write_text("")
+    test_competitions_file = tmp_path/"competitions.json"
+    test_competitions_file.write_text("")
     # print the json content
-    json.dump(MOCK_COMPETITIONS, test_clubs_file.open(mode="w"))
+    json.dump(MOCK_COMPETITIONS, test_competitions_file.open(mode="w"))
     # monkeypath the working directory to the tmp_dir
     monkeypatch.chdir(tmp_path)
     
@@ -113,6 +113,9 @@ def test_isCompetitionActive():
     assert results[0] == False
     assert results[1] == False
     assert results[2] == True
+
+def test_book_to_full_competition_not_accessible():
+    assert 0
 
 def test_club_without_points_cant_book(client, monkeypatch):
     clubs = _list_of_clubs()
@@ -231,7 +234,8 @@ def test_showSummary_status_code_ok(client, monkeypatch):
 
     club = clubs[0]
     
-    response = client.post('/showSummary',
+    response = client.post(
+        '/showSummary',
         data = {
             "email": club["email"] 
         })
