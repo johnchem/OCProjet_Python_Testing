@@ -114,8 +114,24 @@ def test_isCompetitionActive():
     assert results[1] == False
     assert results[2] == True
 
-def test_book_to_full_competition_not_accessible():
-    assert 0
+def test_book_to_full_competition_not_accessible(client, monkeypatch):
+    clubs = _list_of_clubs()
+    competitions = _list_of_competitions()
+    monkeypatch.setattr(server, 'clubs', clubs)
+    monkeypatch.setattr(server, 'competitions', competitions)
+
+    
+    club = MOCK_CLUBS["clubs"][0]
+    club["points"] = 5
+    competition = MOCK_COMPETITIONS["competitions"][0]
+        
+    result = client.post('/purchasePlaces', data={
+        "competition": competition["name"],
+        "club": club["name"],
+        "places":1,
+    })
+    data = result.data.decode()
+    assert data.find("<li>Great-booking complete!</li>") != -1
 
 def test_club_without_points_cant_book(client, monkeypatch):
     clubs = _list_of_clubs()
