@@ -2,10 +2,9 @@ bin
 include
 lib
 .Python
+tests/
 .envrc
 __pycache__
 .vscode
 pyvenv.cfg
 Scripts/
-.coverage*
-htmlcov/
