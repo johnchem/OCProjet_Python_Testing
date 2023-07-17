@@ -1,3 +1,6 @@
+import pytest
+from random import randrange
+
 from locust import HttpUser, task
 from server import competitions, clubs
 
@@ -5,7 +8,7 @@ class ProjectTestPref(HttpUser):
 
     @task
     def showSummary(self):
-        reponse = self.client.post(
+        self.client.post(
             "/showSummary",{
                 "email":"john@simplylift.co"
             }
@@ -13,13 +16,18 @@ class ProjectTestPref(HttpUser):
 
     @task
     def bookPlaces(self):
-        club = clubs[0]
-        print(club)
-        competition = competitions[0]
+        club = clubs[randrange(len(clubs))]
+        
+        competition = competitions[randrange(len(competitions))]
+        competition['isActive'] = True
+
 
         self.client.get(f'/book/{competition["name"]}/{club["name"]}')
-        response = self.client.post("/purchasePlaces",{
-            "competition": competition,
-            "club": club,
-            "places":1,
-            })
+        response = self.client.post(
+            '/purchasePlaces',
+            data={
+                "competition": competition["name"],
+                "club": club["name"],
+                "places":0,
+            }
+            )
