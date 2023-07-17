@@ -1,0 +1,6 @@
+[run]
+omit = 
+    .pytest_cache/
+    .vscode/
+    Lib/
+    Scripts/
