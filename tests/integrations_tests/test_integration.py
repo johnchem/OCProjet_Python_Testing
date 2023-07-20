@@ -76,7 +76,7 @@ def test_user_connect_book_quit(tmp_path, monkeypatch, client):
         assert club["name"] == club_name
 
         # check that the club has enough point to buy the places
-        if not int(club["points"]) > 0 and int(club["points"]) > 5:
+        if not int(club["points"]) > 5:
             club["points"] = 5
 
         # check that there are enough place in the competition
