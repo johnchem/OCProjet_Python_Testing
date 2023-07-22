@@ -1,4 +1,5 @@
 from random import randrange
+import os
 import re
 
 from bs4 import BeautifulSoup
@@ -17,8 +18,8 @@ def test_user_connect_book_quit(tmp_path, monkeypatch, client):
     test_competitions_file.write_text("")
 
     # print the json content
-    json.dump(MOCK_CLUBS, test_clubs_file.open(mode="w"))
-    json.dump(MOCK_COMPETITIONS, test_competitions_file.open(mode="w"))
+    json.dump(MOCK_CLUBS, test_clubs_file.open(mode="w+"))
+    json.dump(MOCK_COMPETITIONS, test_competitions_file.open(mode="w+"))
 
     # monkeypath the working directory to the tmp_dir
     monkeypatch.chdir(tmp_path)
@@ -75,6 +76,13 @@ def test_user_connect_book_quit(tmp_path, monkeypatch, client):
 
         assert club["name"] == club_name
 
+        for compt in competitions:
+            if compt["name"] != competition_name:
+                continue
+            if club_name in compt:
+                compt[club_name] = 0
+                print(competitions)
+
         places_to_buy = 5
         # check that the club has enough point to buy the places
         if int(club["points"]) < places_to_buy:
@@ -92,8 +100,12 @@ def test_user_connect_book_quit(tmp_path, monkeypatch, client):
                 "places": places_to_buy,
             }
         )
+
         data = response.data.decode()
-        assert data.find("<li>Great-booking complete!</li>") != -1
+        assert data.find("<li>Great-booking complete!</li>") != -1, print(data)
 
         response = client.get("/logout")
         assert response.status_code == 200
+
+    os.unlink(test_clubs_file)
+    os.unlink(test_competitions_file)
